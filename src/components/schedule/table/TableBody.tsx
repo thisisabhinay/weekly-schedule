@@ -1,25 +1,24 @@
 /**
- * @module ScheduleBody
- * @description Body component for the weekly schedule table
+ * @module TableBody
+ * @description Body component for the schedule table
  */
 
 import { TimeBlock } from '@/types/schedule';
-import { HoverableText } from './HoverableText';
+import { HoverableText } from '../HoverableText';
 import { filterBreaks } from '@/lib/schedule';
 import { getCurrentTimeBlock } from '@/lib/time';
 
-interface ScheduleBodyProps {
+interface TableBodyProps {
   /** Array of time blocks containing schedule data */
   timeBlocks: TimeBlock[];
 }
 
 /**
- * ScheduleBody Component
- * Renders the main content of the schedule table
- * @param {ScheduleBodyProps} props - Component props
+ * TableBody Component
+ * @param {TableBodyProps} props - Component props
  * @returns {JSX.Element} Rendered table body
  */
-export const ScheduleBody = ({ timeBlocks }: ScheduleBodyProps) => {
+export const TableBody = ({ timeBlocks }: TableBodyProps) => {
   const currentBlock = getCurrentTimeBlock();
   const currentDay = new Date().getDay();
   

@@ -1,0 +1,385 @@
+diff --git a/README.md b/README.md
+index 985fab7..fa2cca7 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,60 @@
+-# weekly-schedule
++# Weekly Schedule Application
+ 
+-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/thisisabhinay/weekly-schedule)
+\ No newline at end of file
++A React-based weekly schedule application that displays and manages time blocks and activities.
++
++## Features
++
++- Display weekly schedule with morning, afternoon, and evening blocks
++- Highlight current time block
++- Hover cards for detailed activity descriptions
++- Responsive design
++- Dark mode support
++
++## Getting Started
++
++```bash
++# Install dependencies
++npm install
++
++# Start development server
++npm run dev
++
++# Run tests
++npm run test
++
++# Run E2E tests
++npm run test:e2e
++
++# Generate documentation
++npm run docs
++```
++
++## Testing
++
++The project includes:
++- Unit tests using Vitest and Testing Library
++- E2E tests using Playwright
++- Test coverage reporting
++
++## Documentation
++
++- Component documentation is available in JSDoc format
++- API documentation can be generated using `npm run docs`
++- Type definitions are fully documented
++
++## Project Structure
++
++```
++src/
++├── components/     # React components
++├── lib/           # Utility functions
++├── types/         # TypeScript types
++└── test/          # Test setup and utilities
++```
++
++## Contributing
++
++1. Write tests for new features
++2. Update documentation
++3. Follow the existing code style
++4. Submit a pull request
+\ No newline at end of file
+diff --git a/package.json b/package.json
+index 3b601a6..7dd9f44 100644
+--- a/package.json
++++ b/package.json
+@@ -7,7 +7,13 @@
+     "dev": "vite",
+     "build": "tsc -b && vite build",
+     "lint": "eslint .",
+-    "preview": "vite preview"
++    "preview": "vite preview",
++    "test": "vitest run",
++    "test:watch": "vitest",
++    "test:ui": "vitest --ui",
++    "test:coverage": "vitest run --coverage",
++    "test:e2e": "playwright test",
++    "docs": "typedoc --out docs src"
+   },
+   "dependencies": {
+     "@hookform/resolvers": "^3.9.0",
+@@ -61,19 +67,29 @@
+   },
+   "devDependencies": {
+     "@eslint/js": "^9.11.1",
++    "@playwright/test": "^1.42.1",
++    "@testing-library/jest-dom": "^6.4.2",
++    "@testing-library/react": "^14.2.1",
++    "@testing-library/user-event": "^14.5.2",
+     "@types/node": "^22.7.3",
+     "@types/react": "^18.3.9",
+     "@types/react-dom": "^18.3.0",
+     "@vitejs/plugin-react": "^4.3.1",
++    "@vitest/coverage-v8": "^1.3.1",
++    "@vitest/ui": "^1.3.1",
+     "autoprefixer": "^10.4.20",
+     "eslint": "^9.11.1",
+     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+     "eslint-plugin-react-refresh": "^0.4.12",
+     "globals": "^15.9.0",
++    "happy-dom": "^13.6.2",
++    "jsdom": "^24.0.0",
+     "postcss": "^8.4.47",
+     "tailwindcss": "^3.4.13",
++    "typedoc": "^0.25.12",
+     "typescript": "^5.5.3",
+     "typescript-eslint": "^8.7.0",
+-    "vite": "^5.4.8"
++    "vite": "^5.4.8",
++    "vitest": "^1.3.1"
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/src/components/schedule/HoverableText.tsx b/src/components/schedule/HoverableText.tsx
+index adc25c9..e8acbfe 100644
+--- a/src/components/schedule/HoverableText.tsx
++++ b/src/components/schedule/HoverableText.tsx
+@@ -1,3 +1,8 @@
++/**
++ * @module HoverableText
++ * @description A component that displays text with an optional hover card for additional details
++ */
++
+ import {
+   HoverCard,
+   HoverCardContent,
+@@ -5,6 +10,14 @@ import {
+ } from "@/components/ui/hover-card";
+ import { HoverableTextProps } from "@/types/schedule";
+ 
++/**
++ * HoverableText Component
++ * Renders text that shows additional information in a hover card when moused over
++ * @param {HoverableTextProps} props - Component props
++ * @param {string} props.text - The text to display
++ * @param {string} [props.description] - Optional description shown in hover card
++ * @returns {JSX.Element} Rendered component
++ */
+ export const HoverableText = ({ text, description }: HoverableTextProps) => {
+   if (!description) return <span>{text}</span>;
+ 
+diff --git a/src/components/schedule/ScheduleBody.tsx b/src/components/schedule/ScheduleBody.tsx
+index 421588a..d5d7c84 100644
+--- a/src/components/schedule/ScheduleBody.tsx
++++ b/src/components/schedule/ScheduleBody.tsx
+@@ -1,12 +1,24 @@
++/**
++ * @module ScheduleBody
++ * @description Body component for the weekly schedule table
++ */
++
+ import { TimeBlock } from '@/types/schedule';
+ import { HoverableText } from './HoverableText';
+ import { filterBreaks } from '@/lib/schedule';
+ import { getCurrentTimeBlock } from '@/lib/time';
+ 
+ interface ScheduleBodyProps {
++  /** Array of time blocks containing schedule data */
+   timeBlocks: TimeBlock[];
+ }
+ 
++/**
++ * ScheduleBody Component
++ * Renders the main content of the schedule table
++ * @param {ScheduleBodyProps} props - Component props
++ * @returns {JSX.Element} Rendered table body
++ */
+ export const ScheduleBody = ({ timeBlocks }: ScheduleBodyProps) => {
+   const currentBlock = getCurrentTimeBlock();
+   const currentDay = new Date().getDay();
+@@ -21,7 +33,7 @@ export const ScheduleBody = ({ timeBlocks }: ScheduleBodyProps) => {
+           {block.days.map((day, dayIndex) => {
+             const activities = filterBreaks(day);
+             const isCurrentTimeBlock = block.name.includes(currentBlock);
+-            const isCurrentDay = dayIndex === currentDay - 1; // Adjust for Sunday being 0
++            const isCurrentDay = dayIndex === currentDay - 1;
+             const shouldHighlight = isCurrentTimeBlock && isCurrentDay && currentDay >= 1 && currentDay <= 5;
+             
+             return (
+diff --git a/src/components/schedule/ScheduleHeader.tsx b/src/components/schedule/ScheduleHeader.tsx
+index 4cbc939..d548579 100644
+--- a/src/components/schedule/ScheduleHeader.tsx
++++ b/src/components/schedule/ScheduleHeader.tsx
+@@ -1,9 +1,21 @@
++/**
++ * @module ScheduleHeader
++ * @description Header component for the weekly schedule table
++ */
++
+ import { ScheduleData } from '@/types/schedule';
+ 
+ interface ScheduleHeaderProps {
++  /** Array of header labels for the schedule table */
+   headers: ScheduleData['headers'];
+ }
+ 
++/**
++ * ScheduleHeader Component
++ * Renders the header row of the schedule table
++ * @param {ScheduleHeaderProps} props - Component props
++ * @returns {JSX.Element} Rendered table header
++ */
+ export const ScheduleHeader = ({ headers }: ScheduleHeaderProps) => (
+   <thead>
+     <tr>
+diff --git a/src/components/schedule/WeeklyScheduleTable.tsx b/src/components/schedule/WeeklyScheduleTable.tsx
+index 84fc1a8..feba477 100644
+--- a/src/components/schedule/WeeklyScheduleTable.tsx
++++ b/src/components/schedule/WeeklyScheduleTable.tsx
+@@ -14,9 +14,8 @@ export const WeeklyScheduleTable = () => {
+     <Card className="shadow-lg">
+       <CardHeader className="flex flex-row items-center justify-between">
+         <CardTitle className="text-xl">Weekly Schedule (6-8 Hours Daily)</CardTitle>
+-        <div className="text-sm text-muted-foreground flex items-center gap-4 text-right">
+-          <div>{today}</div>
+-          <div>{currentTime}</div>
++        <div className="text-sm text-muted-foreground">
++          {today} • {currentTime}
+         </div>
+       </CardHeader>
+       <CardContent className="overflow-x-auto">
+diff --git a/src/lib/schedule.ts b/src/lib/schedule.ts
+index ee2d11e..ea5c1ba 100644
+--- a/src/lib/schedule.ts
++++ b/src/lib/schedule.ts
+@@ -1,9 +1,24 @@
++/**
++ * @module schedule
++ * @description Utilities for managing schedule data and operations
++ */
++
+ import { DaySchedule } from '@/types/schedule';
+ 
++/**
++ * Filters out break activities from a schedule
++ * @param {DaySchedule[]} activities - List of scheduled activities
++ * @returns {DaySchedule[]} Filtered list without breaks
++ */
+ export const filterBreaks = (activities: DaySchedule[]): DaySchedule[] => {
+   return activities.filter(item => !item.activity.text.toLowerCase().includes('break'));
+ };
+ 
++/**
++ * Formats duration string maintaining special cases
++ * @param {string} duration - Duration string to format
++ * @returns {string} Formatted duration string
++ */
+ export const formatDuration = (duration: string): string => {
+   if (duration.includes('Flexible') || duration.includes('Optional') || duration.includes('needed')) {
+     return duration;
+diff --git a/src/lib/time.ts b/src/lib/time.ts
+index 470b549..851b203 100644
+--- a/src/lib/time.ts
++++ b/src/lib/time.ts
+@@ -1,5 +1,13 @@
+-import { TimeBlock } from '@/types/schedule';
++/**
++ * @module time
++ * @description Utilities for handling time-related operations in the schedule
++ */
+ 
++/**
++ * Parses a duration string into minutes
++ * @param {string} duration - Duration string in format "Xh Ym" or special values like "Flexible"
++ * @returns {number} Total minutes, or 0 for flexible durations
++ */
+ export const parseDuration = (duration: string): number => {
+   if (duration.includes('Flexible') || duration.includes('Optional') || duration.includes('needed')) {
+     return 0;
+@@ -11,10 +19,20 @@ export const parseDuration = (duration: string): number => {
+   return (hours ? parseInt(hours[1]) * 60 : 0) + (minutes ? parseInt(minutes[1]) : 0);
+ };
+ 
++/**
++ * Calculates total duration from an array of duration strings
++ * @param {string[]} durations - Array of duration strings
++ * @returns {number} Total duration in minutes
++ */
+ export const calculateTotalDuration = (durations: string[]): number => {
+   return durations.reduce((total, duration) => total + parseDuration(duration), 0);
+ };
+ 
++/**
++ * Formats minutes into a readable duration string
++ * @param {number} minutes - Duration in minutes
++ * @returns {string} Formatted duration string
++ */
+ export const formatBlockDuration = (minutes: number): string => {
+   if (minutes === 0) return 'Flexible';
+   const hours = Math.floor(minutes / 60);
+@@ -25,6 +43,10 @@ export const formatBlockDuration = (minutes: number): string => {
+   return `${hours}h ${remainingMinutes}m`;
+ };
+ 
++/**
++ * Determines the current time block based on the time of day
++ * @returns {string} Current time block name or empty string if outside blocks
++ */
+ export const getCurrentTimeBlock = (): string => {
+   const hour = new Date().getHours();
+   
+@@ -34,6 +56,10 @@ export const getCurrentTimeBlock = (): string => {
+   return '';
+ };
+ 
++/**
++ * Formats the current time in 12-hour format with AM/PM
++ * @returns {string} Formatted time string
++ */
+ export const formatCurrentTime = (): string => {
+   return new Date().toLocaleTimeString('en-US', {
+     hour: 'numeric',
+diff --git a/src/types/schedule.ts b/src/types/schedule.ts
+index fafd979..91aec68 100644
+--- a/src/types/schedule.ts
++++ b/src/types/schedule.ts
+@@ -1,24 +1,59 @@
++/**
++ * @module schedule-types
++ * @description Type definitions for the schedule system
++ */
++
++/**
++ * Represents an activity with optional description
++ * @interface ActivityDescription
++ */
+ export interface ActivityDescription {
++  /** Text label for the activity */
+   text: string;
++  /** Optional detailed description shown in hover card */
+   description?: string;
+ }
+ 
++/**
++ * Represents a scheduled activity with duration
++ * @interface DaySchedule
++ */
+ export interface DaySchedule {
++  /** Activity details */
+   activity: ActivityDescription;
++  /** Duration string (e.g., "1h 30m", "Flexible") */
+   duration: string;
+ }
+ 
++/**
++ * Represents a time block in the schedule
++ * @interface TimeBlock
++ */
+ export interface TimeBlock {
++  /** Name of the time block */
+   name: string;
++  /** Activities for each day of the week */
+   days: DaySchedule[][];
+ }
+ 
++/**
++ * Complete schedule data structure
++ * @interface ScheduleData
++ */
+ export interface ScheduleData {
++  /** Column headers for the schedule table */
+   headers: string[];
++  /** Time blocks containing activities */
+   timeBlocks: TimeBlock[];
+ }
+ 
++/**
++ * Props for hoverable text component
++ * @interface HoverableTextProps
++ */
+ export interface HoverableTextProps {
++  /** Text to display */
+   text: string;
++  /** Optional description shown in hover card */
+   description?: string;
+ }
+\ No newline at end of file

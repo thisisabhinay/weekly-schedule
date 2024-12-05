@@ -1,22 +1,21 @@
 /**
- * @module ScheduleHeader
- * @description Header component for the weekly schedule table
+ * @module TableHeader
+ * @description Header component for the schedule table
  */
 
 import { ScheduleData } from '@/types/schedule';
 
-interface ScheduleHeaderProps {
+interface TableHeaderProps {
   /** Array of header labels for the schedule table */
   headers: ScheduleData['headers'];
 }
 
 /**
- * ScheduleHeader Component
- * Renders the header row of the schedule table
- * @param {ScheduleHeaderProps} props - Component props
+ * TableHeader Component
+ * @param {TableHeaderProps} props - Component props
  * @returns {JSX.Element} Rendered table header
  */
-export const ScheduleHeader = ({ headers }: ScheduleHeaderProps) => (
+export const TableHeader = ({ headers }: TableHeaderProps) => (
   <thead>
     <tr>
       {headers.map((header, index) => (

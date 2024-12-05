@@ -14,9 +14,8 @@ export const WeeklyScheduleTable = () => {
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl">Weekly Schedule (6-8 Hours Daily)</CardTitle>
-        <div className="text-sm text-muted-foreground flex items-center gap-4 text-right">
-          <div>{today}</div>
-          <div>{currentTime}</div>
+        <div className="text-sm text-muted-foreground">
+          {today} • {currentTime}
         </div>
       </CardHeader>
       <CardContent className="overflow-x-auto">
