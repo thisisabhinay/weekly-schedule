@@ -2,12 +2,11 @@
  * @module ScheduleHeader
  * @description Header component for the weekly schedule table
  */
-
-import { ScheduleData } from '@/types/schedule';
+import { ScheduleData } from "@/types/schedule"
 
 interface ScheduleHeaderProps {
   /** Array of header labels for the schedule table */
-  headers: ScheduleData['headers'];
+  headers: ScheduleData["headers"]
 }
 
 /**
@@ -22,11 +21,11 @@ export const ScheduleHeader = ({ headers }: ScheduleHeaderProps) => (
       {headers.map((header, index) => (
         <th
           key={index}
-          className="border p-2 bg-gray-100 font-semibold text-sm"
+          className="border border-neutral-200 dark:border-neutral-700 p-2 bg-gray-100 dark:bg-neutral-800/80 font-semibold text-sm"
         >
           {header}
         </th>
       ))}
     </tr>
   </thead>
-);
+)
