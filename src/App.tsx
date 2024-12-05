@@ -1,4 +1,4 @@
-import { WeeklyScheduleTable } from '@/components/schedule/WeeklyScheduleTable';
+import { WeeklyScheduleTable } from "@/components/schedule/WeeklyScheduleTable"
 
 function App() {
   return (
@@ -7,7 +7,7 @@ function App() {
         <WeeklyScheduleTable />
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
