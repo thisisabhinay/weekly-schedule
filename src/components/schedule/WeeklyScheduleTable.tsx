@@ -12,7 +12,7 @@ export const WeeklyScheduleTable = () => {
 
   return (
     <Card className="shadow-lg  mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between" role="banner">
         <CardTitle className="text-xl">Weekly Schedule (6-8 Hours Daily)</CardTitle>
         <div className="text-sm text-muted-foreground">
           {today} • {currentTime}
